@@ -688,21 +688,26 @@ st.dataframe(stats_df.style.format({
 st.subheader("Download Results")
 def convert_df_to_excel(df):
     output = io.BytesIO()
-    writer = pd.ExcelWriter(output, engine='openpyxl')
-    df.to_excel(writer, sheet_name='Results')
-    writer.save()
+    with pd.ExcelWriter(output, engine='openpyxl') as writer:
+        df.to_excel(writer, sheet_name='Results')
     processed_data = output.getvalue()
     return processed_data
 
+
 import io
+
 if st.button("Download Statistics as Excel"):
-    excel_data = convert_df_to_excel(stats_df)
-    st.download_button(
-        label="Download Excel",
-        data=excel_data,
-        file_name='trading_strategy_statistics.xlsx',
-        mime='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
-    )
+    if not stats_df.empty:
+        excel_data = convert_df_to_excel(stats_df)
+        st.download_button(
+            label="Download Excel",
+            data=excel_data,
+            file_name='trading_strategy_statistics.xlsx',
+            mime='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+        )
+    else:
+        st.warning("No statistics available to download.")
+
 
 # Show individual strategy plots
 st.subheader("Individual Strategy Returns")
