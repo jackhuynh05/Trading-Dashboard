@@ -34,7 +34,6 @@ wti_file = st.sidebar.file_uploader("Upload wti_data.csv", type=["csv"])
 
 # If files are not uploaded, use sample data
 @st.cache_data
-# Updated load_sample_data function
 def load_sample_data():
     N = 2500  # Number of time steps (days)
     dt = 1/252  # Time step in years (assuming 252 trading days per year)
@@ -71,9 +70,44 @@ def load_sample_data():
     volume_dal = np.random.randint(500, 1500, size=N)
     volume_wti = np.random.randint(500, 1500, size=N)
     
-    # Create DataFrames
-    dal_data = pd.DataFrame({'Close': dal_close, 'Volume': volume_dal}, index=dates)
-    wti_data = pd.DataFrame({'Close': wti_close, 'Volume': volume_wti}, index=dates)
+    # **Start of Added Code: Generate High and Low Prices**
+    # Define maximum intraday movement percentages
+    max_intraday_up = 0.02  # Up to +2% of Close
+    max_intraday_down = 0.02  # Down to -2% of Close
+    
+    # Generate High prices for DAL
+    high_dal = dal_close * (1 + np.random.uniform(0, max_intraday_up, size=N))
+    # Ensure High is at least equal to Close
+    high_dal = np.maximum(high_dal, dal_close)
+    
+    # Generate Low prices for DAL
+    low_dal = dal_close * (1 - np.random.uniform(0, max_intraday_down, size=N))
+    # Ensure Low is at most equal to Close
+    low_dal = np.minimum(low_dal, dal_close)
+    
+    # Generate High prices for WTI
+    high_wti = wti_close * (1 + np.random.uniform(0, max_intraday_up, size=N))
+    high_wti = np.maximum(high_wti, wti_close)
+    
+    # Generate Low prices for WTI
+    low_wti = wti_close * (1 - np.random.uniform(0, max_intraday_down, size=N))
+    low_wti = np.minimum(low_wti, wti_close)
+    # **End of Added Code**
+    
+    # Create DataFrames with High and Low prices
+    dal_data = pd.DataFrame({
+        'Close': dal_close,
+        'High': high_dal,
+        'Low': low_dal,
+        'Volume': volume_dal
+    }, index=dates)
+    
+    wti_data = pd.DataFrame({
+        'Close': wti_close,
+        'High': high_wti,
+        'Low': low_wti,
+        'Volume': volume_wti
+    }, index=dates)
     
     return dal_data, wti_data
 
