@@ -34,13 +34,47 @@ wti_file = st.sidebar.file_uploader("Upload wti_data.csv", type=["csv"])
 
 # If files are not uploaded, use sample data
 @st.cache_data
+# Updated load_sample_data function
 def load_sample_data():
-    dates = pd.date_range(start="2020-01-01", periods=2500, freq='D')
-    np.random.seed(0)
-    dal_close = np.cumsum(np.random.randn(2500)) + 100
-    wti_close = np.cumsum(np.random.randn(2500)) + 50
-    dal_data = pd.DataFrame({'Close': dal_close}, index=dates)
-    wti_data = pd.DataFrame({'Close': wti_close}, index=dates)
+    N = 2500  # Number of time steps (days)
+    dt = 1/252  # Time step in years (assuming 252 trading days per year)
+    
+    # Generate a date range
+    dates = pd.date_range(start="2020-01-01", periods=N, freq='D')
+    
+    # Function to simulate GBM
+    def simulate_gbm(S0, mu, sigma, N, dt):
+        S = np.zeros(N)
+        S[0] = S0
+        for t in range(1, N):
+            Z = np.random.standard_normal()
+            S[t] = S[t-1] * np.exp((mu - 0.5 * sigma**2) * dt + sigma * np.sqrt(dt) * Z)
+        return S
+    
+    # Parameters for DAL (Delta Air Lines)
+    mu_dal = np.random.uniform(0.05, 0.15)  # Drift between 5% and 15% annual
+    sigma_dal = np.random.uniform(0.1, 0.3)  # Volatility between 10% and 30% annual
+    S0_dal = 100  # Initial price
+    
+    # Simulate DAL Close Prices
+    dal_close = simulate_gbm(S0=S0_dal, mu=mu_dal, sigma=sigma_dal, N=N, dt=dt)
+    
+    # Parameters for WTI (West Texas Intermediate)
+    mu_wti = np.random.uniform(0.05, 0.15)
+    sigma_wti = np.random.uniform(0.1, 0.3)
+    S0_wti = 50  # Initial price
+    
+    # Simulate WTI Close Prices
+    wti_close = simulate_gbm(S0=S0_wti, mu=mu_wti, sigma=sigma_wti, N=N, dt=dt)
+    
+    # Simulate Volume as random integers between 500 and 1500
+    volume_dal = np.random.randint(500, 1500, size=N)
+    volume_wti = np.random.randint(500, 1500, size=N)
+    
+    # Create DataFrames
+    dal_data = pd.DataFrame({'Close': dal_close, 'Volume': volume_dal}, index=dates)
+    wti_data = pd.DataFrame({'Close': wti_close, 'Volume': volume_wti}, index=dates)
+    
     return dal_data, wti_data
 
 if dal_file and wti_file:
