@@ -35,10 +35,10 @@ wti_file = st.sidebar.file_uploader("Upload wti_data.csv", type=["csv"])
 # If files are not uploaded, use sample data
 @st.cache_data
 def load_sample_data():
-    dates = pd.date_range(start="2020-01-01", periods=500, freq='D')
+    dates = pd.date_range(start="2020-01-01", periods=2500, freq='D')
     np.random.seed(0)
-    dal_close = np.cumsum(np.random.randn(500)) + 100
-    wti_close = np.cumsum(np.random.randn(500)) + 50
+    dal_close = np.cumsum(np.random.randn(2500)) + 100
+    wti_close = np.cumsum(np.random.randn(2500)) + 50
     dal_data = pd.DataFrame({'Close': dal_close}, index=dates)
     wti_data = pd.DataFrame({'Close': wti_close}, index=dates)
     return dal_data, wti_data
