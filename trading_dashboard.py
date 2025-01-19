@@ -70,29 +70,25 @@ def load_sample_data():
     volume_dal = np.random.randint(500, 1500, size=N)
     volume_wti = np.random.randint(500, 1500, size=N)
     
-    # **Start of Added Code: Generate High and Low Prices**
     # Define maximum intraday movement percentages
     max_intraday_up = 0.02  # Up to +2% of Close
     max_intraday_down = 0.02  # Down to -2% of Close
     
     # Generate High prices for DAL
     high_dal = dal_close * (1 + np.random.uniform(0, max_intraday_up, size=N))
-    # Ensure High is at least equal to Close
-    high_dal = np.maximum(high_dal, dal_close)
+    high_dal = np.maximum(high_dal, dal_close)  # Ensure High >= Close
     
     # Generate Low prices for DAL
     low_dal = dal_close * (1 - np.random.uniform(0, max_intraday_down, size=N))
-    # Ensure Low is at most equal to Close
-    low_dal = np.minimum(low_dal, dal_close)
+    low_dal = np.minimum(low_dal, dal_close)  # Ensure Low <= Close
     
     # Generate High prices for WTI
     high_wti = wti_close * (1 + np.random.uniform(0, max_intraday_up, size=N))
-    high_wti = np.maximum(high_wti, wti_close)
+    high_wti = np.maximum(high_wti, wti_close)  # Ensure High >= Close
     
     # Generate Low prices for WTI
     low_wti = wti_close * (1 - np.random.uniform(0, max_intraday_down, size=N))
-    low_wti = np.minimum(low_wti, wti_close)
-    # **End of Added Code**
+    low_wti = np.minimum(low_wti, wti_close)  # Ensure Low <= Close
     
     # Create DataFrames with High and Low prices
     dal_data = pd.DataFrame({
