@@ -51,7 +51,7 @@ def load_sample_data():
         return S
     
     # Parameters for DAL (Delta Air Lines)
-    mu_dal = np.random.uniform(0.05, 0.15)  # Drift between 5% and 15% annual
+    mu_dal = np.random.uniform(0.0, 0.15)  # Drift between 0% and 15% annual
     sigma_dal = np.random.uniform(0.1, 0.3)  # Volatility between 10% and 30% annual
     S0_dal = 100  # Initial price
     
